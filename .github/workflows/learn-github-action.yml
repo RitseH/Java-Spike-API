@@ -1,6 +1,6 @@
-name: Build and test mindstorms api
+name: Build test and publish mindstorms api
 
-run-name: Build and test mindstorms api
+run-name: Build test and publish mindstorms api
 
 on: [push]
 
