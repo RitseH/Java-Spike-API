@@ -11,31 +11,29 @@ import java.util.logging.Logger;
 
 public class MindstormsHubImpl implements MindstormsHub {
 
-	private static final Logger LOGGER = Logger.getLogger( MindstormsHubImpl.class.getName());
+	private static final Logger LOGGER = Logger.getLogger(MindstormsHubImpl.class.getName());
 	/**
 	 * The command executor of the mindstorms hub
 	 */
 	private final SpikeCommandExecutor spikeCommandExecutor;
-
+	/**
+	 * The map which contains the motors of a mindstorms hub combined to the port
+	 */
+	private final Map<MotorEnum, Motor> motorMap = new HashMap<>();
+	/**
+	 * The map which contains the buttons of a mindstorms hub
+	 */
+	private final Map<ButtonEnum, Button> buttonMap = new HashMap<>();
 	/**
 	 * The distance sensor of the mindstorms hub
 	 */
 	private DistanceSensor distanceSensor;
-
+	;
 	/**
 	 * The color sensor of the mindstorms hub
 	 */
 	private ColorSensor colorSensor;
-
-	/**
-	 * The map which contains the motors of a mindstorms hub combined to the port
-	 */
-	private final Map<MotorEnum, Motor> motorMap = new HashMap<>();;
-
-	/**
-	 * The map which contains the buttons of a mindstorms hub
-	 */
-	private final Map<ButtonEnum, Button> buttonMap = new HashMap<>();;
+	;
 
 	/**
 	 * Constructor.
@@ -81,6 +79,15 @@ public class MindstormsHubImpl implements MindstormsHub {
 	@Override
 	public void displayText(final String text) throws IOException {
 		spikeCommandExecutor.executeVoid(format("hub.display.show(\"%s\")", text));
+	}
+
+	@Override
+	public void displayImage(String text) throws IOException {
+		try {
+			spikeCommandExecutor.execute(format("hub.display.show(%s)", text));
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override

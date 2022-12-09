@@ -54,7 +54,7 @@ publishing {
         maven(MavenPublication) {
             groupId = 'ritseh'
             artifactId = 'java-spike-api'
-            version = '0.4'
+            version = '0.5'
             from components.java
         }
     }

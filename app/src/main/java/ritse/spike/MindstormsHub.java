@@ -22,6 +22,8 @@ public interface MindstormsHub {
 	 */
 	void displayText(final String text) throws IOException;
 
+	void displayImage(final String text) throws IOException;
+
 	/**
 	 * This method creates a motor
 	 *

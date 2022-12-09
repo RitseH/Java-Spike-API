@@ -4,6 +4,7 @@ import static java.lang.String.format;
 
 import java.io.IOException;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 
@@ -248,6 +249,11 @@ public class Motor {
 	 */
 	public void setStopAction(final String stopAction) throws IOException {
 		spikeCommandExecutor.executeVoid(format("motor%s.set_stop_action(" + stopAction + ")", motorEnum.asString));
+	}
+
+	@Override
+	public boolean equals(final Object obj) {
+		return EqualsBuilder.reflectionEquals(this, obj);
 	}
 
 	@Override

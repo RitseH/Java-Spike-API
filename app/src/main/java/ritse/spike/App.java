@@ -8,5 +8,7 @@ public class App {
 		MindstormsHubImpl hub = new MindstormsHubImpl("COM5");
 		hub.initialize();
 
+		hub.displayImage("hub.Image.HAPPY");
+		hub.displayImage("hub.Image.COW");
 	}
 }
