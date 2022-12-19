@@ -3,6 +3,9 @@ package ritse.spike;
 import static java.lang.String.format;
 
 import java.io.IOException;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Represents a color sensor on the mindstorms hub
@@ -15,12 +18,30 @@ public class ColorSensor {
 	private final SpikeCommandExecutor spikeCommandExecutor;
 
 	/**
+	 * The scheduled executor service
+	 */
+	private final ScheduledExecutorService scheduledExecutorService;
+
+	/**
+	 * The future used to stop execution of scheduled task
+	 */
+	private Future<?> future;
+
+	/**
+	 * The desired result is used for events
+	 */
+	private String desiredResult = "Green";
+
+	/**
 	 * Constructor.
 	 *
 	 * @param spikeCommandExecutor the spike command executor
+	 * @param executorService
 	 */
-	public ColorSensor(final SpikeCommandExecutor spikeCommandExecutor) {
+	public ColorSensor(final SpikeCommandExecutor spikeCommandExecutor, final ScheduledExecutorService executorService) {
 		this.spikeCommandExecutor = spikeCommandExecutor;
+		this.scheduledExecutorService = executorService;
+		start();
 	}
 
 	/** ACTIONS */
@@ -56,7 +77,9 @@ public class ColorSensor {
 	 * @throws IOException when executing the command fails
 	 */
 	public void waitUntilColor(final String color) throws IOException {
-		spikeCommandExecutor.executeVoid(format("color_sensor.wait_until_color('%s')", color));
+		if (desiredResult.equalsIgnoreCase(color)) {
+			System.out.println("color is as expected");
+		}
 	}
 
 	/**
@@ -66,7 +89,7 @@ public class ColorSensor {
 	 * @throws IOException when executing the command fails
 	 */
 	public void waitForNewColor(final String color) throws IOException {
-		spikeCommandExecutor.executeVoid(format("color_sensor.wait_for_new_color('%s')", color));
+
 	}
 
 	/** MEASUREMENTS */
@@ -81,7 +104,7 @@ public class ColorSensor {
 	public String getColor() throws InterruptedException, IOException {
 		final String result = spikeCommandExecutor.execute(format("color_sensor.get_color()"));
 		if (result.equals("None")) {
-			return "0";
+			return "None";
 		}
 		return result;
 	}
@@ -114,5 +137,36 @@ public class ColorSensor {
 			return 0;
 		}
 		return Integer.parseInt(result);
+	}
+
+	/**
+	 * Method to stop executing runnable task
+	 */
+	public void stop() {
+		future.cancel(true);
+	}
+
+	/**
+	 * Starts the scheduled executor service
+	 */
+	private void start() {
+		future = scheduledExecutorService.scheduleAtFixedRate(() -> {
+			try {
+				waitUntilColor(getColor());
+			} catch (InterruptedException e) {
+				throw new RuntimeException(e);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}, 0, 500, TimeUnit.MILLISECONDS);
+
+	}
+
+	/**
+	 * Method to set the desired result
+	 * @param desiredResult the desired result
+	 */
+	public void setDesiredResult(final String desiredResult) {
+		this.desiredResult = desiredResult;
 	}
 }

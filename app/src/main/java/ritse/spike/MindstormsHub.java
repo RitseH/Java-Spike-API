@@ -95,4 +95,7 @@ public interface MindstormsHub {
 	 * @throws IOException when executing command failed
 	 */
 	void initializeEvalFunction() throws IOException;
+
+	// executor shutdown en serial port closen
+	void close() throws IOException;
 }

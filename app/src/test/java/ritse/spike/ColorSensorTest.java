@@ -1,10 +1,16 @@
 package ritse.spike;
 
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.newCapture;
 
-import java.awt.*;
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
+import org.easymock.Capture;
 import org.easymock.EasyMockExtension;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
@@ -21,6 +27,8 @@ public class ColorSensorTest extends EasyMockSupport {
 
 	private ColorSensor colorSensor;
 
+	@Mock
+	private ScheduledExecutorService executorService;
 	private final int brightness_light_1 = 100;
 	private final int brightness_light_2 = 50;
 	private final int brightness_light_3 = 0;
@@ -29,11 +37,18 @@ public class ColorSensorTest extends EasyMockSupport {
 
 	private final String redColor = "red";
 
+	private Capture<Runnable> capture;
+
+	@Mock
+	private ScheduledFuture scheduledFuture;
+
 
 	@BeforeEach
 	public void setUp() {
+		capture = newCapture();
+		expect(executorService.scheduleAtFixedRate(capture(capture), anyLong(), anyLong(), anyObject())).andReturn(scheduledFuture);
 		replayAll();
-		colorSensor = new ColorSensor(spikeCommandExecutor);
+		colorSensor = new ColorSensor(spikeCommandExecutor, executorService);
 		verifyAll();
 		resetAll();
 	}
@@ -96,6 +111,32 @@ public class ColorSensorTest extends EasyMockSupport {
 		replayAll();
 
 		colorSensor.lightUpAll(brightness);
+		verifyAll();
+	}
+
+	@Test
+	public void testColorSensorIsDesiredValue () throws IOException, InterruptedException {
+		// Arrange
+		expect(spikeCommandExecutor.execute("color_sensor.get_color()")).andReturn("Green");
+		replayAll();
+
+		// Act
+		capture.getValue().run();
+
+		// Assert
+		verifyAll();
+	}
+
+	@Test
+	public void testColorSensorIsNotDesiredValue () throws IOException, InterruptedException {
+		// Arrange
+		expect(spikeCommandExecutor.execute("color_sensor.get_color()")).andReturn("PURPLE");
+		replayAll();
+
+		// Act
+		capture.getValue().run();
+
+		// Assert
 		verifyAll();
 	}
 }

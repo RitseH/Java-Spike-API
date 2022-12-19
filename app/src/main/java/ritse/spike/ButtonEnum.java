@@ -1,7 +1,7 @@
 package ritse.spike;
 
 /**
- *
+ * The button enums
  */
 public enum ButtonEnum {
 	LEFT("left"),

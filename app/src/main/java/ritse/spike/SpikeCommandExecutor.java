@@ -53,4 +53,9 @@ public interface SpikeCommandExecutor {
 	 */
 	void addCallback(final String command, Consumer<String> callback) throws IOException, InterruptedException;
 
+	/**
+	 * Closes serial port
+	 */
+	void close() throws IOException;
+
 }

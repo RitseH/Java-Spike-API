@@ -5,12 +5,20 @@ import static java.lang.String.format;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 
+/**
+ * The implementation for the mindstorms hub
+ */
 public class MindstormsHubImpl implements MindstormsHub {
 
+	/**
+	 * The Logger
+	 */
 	private static final Logger LOGGER = Logger.getLogger(MindstormsHubImpl.class.getName());
 	/**
 	 * The command executor of the mindstorms hub
@@ -33,7 +41,10 @@ public class MindstormsHubImpl implements MindstormsHub {
 	 * The color sensor of the mindstorms hub
 	 */
 	private ColorSensor colorSensor;
-	;
+
+	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
+
+
 
 	/**
 	 * Constructor.
@@ -71,8 +82,8 @@ public class MindstormsHubImpl implements MindstormsHub {
 		createMotor(MotorEnum.E);
 		createMotor(MotorEnum.F);
 
-		createColorSensor("C");
 		createDistanceSensor("D");
+		createColorSensor("C");
 		initializeEvalFunction();
 	}
 
@@ -103,7 +114,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 
 	@Override
 	public void createDistanceSensor(final String portChar) throws IOException {
-		distanceSensor = new DistanceSensor(spikeCommandExecutor);
+		distanceSensor = new DistanceSensor(spikeCommandExecutor, executorService);
 		spikeCommandExecutor.executeVoid(format("distance_sensor = DistanceSensor('%s')", portChar));
 	}
 
@@ -114,7 +125,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 
 	@Override
 	public void createColorSensor(final String portChar) throws IOException {
-		colorSensor = new ColorSensor(spikeCommandExecutor);
+		colorSensor = new ColorSensor(spikeCommandExecutor, executorService);
 		spikeCommandExecutor.executeVoid(format("color_sensor = ColorSensor('%s')", portChar));
 	}
 
@@ -138,6 +149,12 @@ public class MindstormsHubImpl implements MindstormsHub {
 	public void initializeEvalFunction() throws IOException {
 		spikeCommandExecutor.executeVoid("def evaluator(msgType, counter, fn):\n " +
 				"return \"!{}:{}:{}%\".format(msgType, counter, eval(fn))\r\n");
+	}
+
+	@Override
+	public void close() throws IOException {
+		spikeCommandExecutor.close();
+		executorService.shutdownNow();
 	}
 }
 

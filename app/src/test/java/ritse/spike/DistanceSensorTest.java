@@ -1,9 +1,16 @@
 package ritse.spike;
 
+import static org.easymock.EasyMock.anyLong;
+import static org.easymock.EasyMock.anyObject;
+import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.newCapture;
 
 import java.io.IOException;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
 
+import org.easymock.Capture;
 import org.easymock.EasyMockExtension;
 import org.easymock.EasyMockSupport;
 import org.easymock.Mock;
@@ -18,6 +25,12 @@ public class DistanceSensorTest extends EasyMockSupport {
 	@Mock
 	private SpikeCommandExecutor spikeCommandExecutor;
 
+	@Mock
+	private ScheduledExecutorService executorService;
+
+	@Mock
+	private ScheduledFuture scheduledFuture;
+
 	private DistanceSensor distanceSensor;
 
 	private final int right_top = 10;
@@ -27,10 +40,15 @@ public class DistanceSensorTest extends EasyMockSupport {
 
 	private final int brightness = 100;
 
+	private Capture<Runnable> capture;
+
+
 	@BeforeEach
 	public void setUp() {
+		capture = newCapture();
+		expect(executorService.scheduleAtFixedRate(capture(capture), anyLong(), anyLong(), anyObject())).andReturn(scheduledFuture);
 		replayAll();
-		distanceSensor = new DistanceSensor(spikeCommandExecutor);
+		distanceSensor = new DistanceSensor(spikeCommandExecutor, executorService);
 		verifyAll();
 		resetAll();
 	}
@@ -105,6 +123,32 @@ public class DistanceSensorTest extends EasyMockSupport {
 
 		distanceSensor.lightUp(right_top, right_bottom, left_bottom, left_top);
 
+		verifyAll();
+	}
+
+	@Test
+	public void testDistanceSensorLargerThanDesiredValue () throws IOException, InterruptedException {
+		// Arrange
+		expect(spikeCommandExecutor.execute("distance_sensor.get_distance_cm()")).andReturn("20");
+		replayAll();
+
+		// Act
+		capture.getValue().run();
+
+		// Assert
+		verifyAll();
+	}
+
+	@Test
+	public void testDistanceSensorSmallerThanDesiredValue () throws IOException, InterruptedException {
+		// Arrange
+		expect(spikeCommandExecutor.execute("distance_sensor.get_distance_cm()")).andReturn("5");
+		replayAll();
+
+		// Act
+		capture.getValue().run();
+
+		// Assert
 		verifyAll();
 	}
 }

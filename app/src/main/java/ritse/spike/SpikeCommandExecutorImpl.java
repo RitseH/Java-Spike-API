@@ -17,6 +17,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.fazecast.jSerialComm.SerialPort;
+
 /**
  * The command executor implementation
  */
@@ -38,7 +40,7 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	/**
 	 * The serial port implementation
 	 */
-	private final SerialPortImpl serialPort;
+	private final LegoSerialPort serialPort;
 	/**
 	 * Handler map with exchangers
 	 */
@@ -151,5 +153,10 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 		final String command = format("%s(lambda x: print(\"CB:%d:\" + str(x) + \"%s\"))\r\n", method, nextId, '%');
 
 		executeVoid(command);
+	}
+
+	@Override
+	public void close() throws IOException {
+		serialPort.close();
 	}
 }
