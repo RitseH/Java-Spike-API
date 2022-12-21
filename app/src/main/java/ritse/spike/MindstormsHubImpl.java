@@ -42,9 +42,10 @@ public class MindstormsHubImpl implements MindstormsHub {
 	 */
 	private ColorSensor colorSensor;
 
+	/**
+	 * The executor service
+	 */
 	private ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
-
-
 
 	/**
 	 * Constructor.
@@ -62,11 +63,11 @@ public class MindstormsHubImpl implements MindstormsHub {
 	 */
 	protected MindstormsHubImpl(final SpikeCommandExecutor executor) {
 		this.spikeCommandExecutor = executor;
-
 	}
 
 	@Override
-	public void initialize() throws IOException {
+	public void open() throws IOException {
+		spikeCommandExecutor.open();
 		LOGGER.log(Level.INFO, "initializing mindstorms hub");
 		spikeCommandExecutor.executeVoid("\003");
 		spikeCommandExecutor.executeVoid("from spike import PrimeHub, LightMatrix, Button, StatusLight, MotionSensor, Speaker, ColorSensor, App, DistanceSensor, Motor");

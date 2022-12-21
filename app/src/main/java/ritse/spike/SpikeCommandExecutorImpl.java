@@ -63,9 +63,8 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	 *
 	 * @param comport the COM port
 	 */
-	public SpikeCommandExecutorImpl(final String comport) throws IOException {
+	public SpikeCommandExecutorImpl(final String comport) {
 		this.serialPort = new SerialPortImpl(comport, 115200, this::extract);
-		serialPort.open();
 	}
 
 	@Override
@@ -158,5 +157,10 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	@Override
 	public void close() throws IOException {
 		serialPort.close();
+	}
+
+	@Override
+	public void open() throws IOException {
+		serialPort.open();
 	}
 }

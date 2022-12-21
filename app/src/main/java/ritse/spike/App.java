@@ -6,7 +6,7 @@ public class App {
 	public static void main(String[] args) throws IOException {
 		System.out.println("Starting");
 		MindstormsHub hub = new MindstormsHubImpl("COM5");
-		hub.initialize();
+		hub.open();
 
 
 

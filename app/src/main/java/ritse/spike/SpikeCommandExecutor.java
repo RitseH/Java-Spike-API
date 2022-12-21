@@ -58,4 +58,6 @@ public interface SpikeCommandExecutor {
 	 */
 	void close() throws IOException;
 
+	void open() throws IOException;
+
 }

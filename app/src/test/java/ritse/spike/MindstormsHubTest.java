@@ -112,7 +112,7 @@ public class MindstormsHubTest extends EasyMockSupport {
 		replayAll();
 
 		// act
-		hub.initialize();
+		hub.open();
 
 		assertNotNull(hub.getButtonByEnum(ButtonEnum.LEFT));
 		assertNotNull(hub.getButtonByEnum(ButtonEnum.RIGHT));

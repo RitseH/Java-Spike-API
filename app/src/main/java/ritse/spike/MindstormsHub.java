@@ -12,7 +12,7 @@ public interface MindstormsHub {
 	 *
 	 * @throws IOException when executing command failed
 	 */
-	void initialize() throws IOException;
+	void open() throws IOException;
 
 	/**
 	 * Displays text on mindstorms hub screen
