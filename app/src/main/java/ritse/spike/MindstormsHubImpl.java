@@ -52,7 +52,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 	 *
 	 * @param port the port
 	 */
-	public MindstormsHubImpl(final String port) throws IOException {
+	public MindstormsHubImpl(final String port) {
 		this(new SpikeCommandExecutorImpl(port));
 	}
 
