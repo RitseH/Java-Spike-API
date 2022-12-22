@@ -2,11 +2,10 @@ package ritse.spike;
 
 import static java.lang.Integer.parseInt;
 import static org.apache.commons.lang3.builder.ToStringBuilder.reflectionToString;
+import static org.apache.commons.lang3.builder.ToStringStyle.SHORT_PREFIX_STYLE;
 
 import java.io.IOException;
 import java.util.function.Consumer;
-
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 /**
  * Class that represents a button on the mindstorms hub
@@ -49,16 +48,13 @@ public class Button {
 	 * @throws InterruptedException when the thread is interrupted, ocupied, sleeping during the activity
 	 */
 	public void callback(final Consumer<Integer> callback) throws IOException, InterruptedException {
-		spikeCommandExecutor.addCallback(String.format("hub.button.%s.callback", buttonEnum.asString), args -> {
-			callback.accept(parseInt(args));
-		});
-
+		spikeCommandExecutor.addCallback(String.format("hub.button.%s.callback", buttonEnum.asString), args -> callback.accept(parseInt(args)));
 	}
 
 
 	@Override
 	public String toString() {
-		return reflectionToString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+		return reflectionToString(this, SHORT_PREFIX_STYLE);
 	}
 
 	public String getDesiredValue() {
