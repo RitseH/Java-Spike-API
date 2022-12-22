@@ -1,6 +1,7 @@
 package ritse.spike;
 
 import static java.lang.String.format;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 
 import java.io.IOException;
@@ -17,8 +18,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.fazecast.jSerialComm.SerialPort;
-
 /**
  * The command executor implementation
  */
@@ -30,12 +29,12 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	 * the pattern of a result message
 	 */
 	// <type>:<message number>:result
-	private static final Pattern RESULT_PATTERN = Pattern.compile("^RC:(\\d+):(.*)");
+	private static final Pattern RESULT_PATTERN = Pattern.compile("^RC:(\\d+):(.*)$");
 
 	/**
 	 * The pattern of a callback message
 	 */
-	private static final Pattern CALLBACK_PATTERN = Pattern.compile(".*CB:(\\d+):(.*)");
+	private static final Pattern CALLBACK_PATTERN = Pattern.compile("^CB:(\\d+):([^+]*)$");
 
 	/**
 	 * The serial port implementation
@@ -69,10 +68,9 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 
 	@Override
 	public void extract(final byte[] bytes) {
-		String message = new String(bytes);
-		String noExclamationMark = message.substring(message.lastIndexOf("!") + 1);
-		String answer = noExclamationMark.substring(0, noExclamationMark.length() - 1);
-		final Matcher resultMatcher = RESULT_PATTERN.matcher(answer);
+		final String message = new String(bytes).replace("%%", "");
+		LOGGER.log(FINE, "< " + message);
+		final Matcher resultMatcher = RESULT_PATTERN.matcher(message);
 		if (resultMatcher.matches()) {
 
 			final int counter = Integer.parseInt(resultMatcher.group(1));
@@ -84,8 +82,7 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 				Thread.currentThread().interrupt();
 			}
 		}
-		final String answerToMatch = answer.trim();
-		final Matcher callbackMatcher = CALLBACK_PATTERN.matcher(answerToMatch);
+		final Matcher callbackMatcher = CALLBACK_PATTERN.matcher(message);
 		if (callbackMatcher.matches()) {
 			final int counter = Integer.parseInt(callbackMatcher.group(1));
 			final String res = callbackMatcher.group(2);
@@ -98,14 +95,13 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	public String execute(final String command) throws IOException, InterruptedException {
 		final int messageCounter = messageNumber++;
 		try {
-
 			final Exchanger<String> exchanger = new Exchanger<>();
-			// put in map
 			handlerMap.put(messageCounter, exchanger);
 
 			final String messageToSend = format("evaluator(\"%s\", %d, \"" + command + "\")\r\n", "RC", messageCounter);
 			final Optional<OutputStream> outputStream = serialPort.getOutputStream();
 			if (outputStream.isPresent()) {
+				LOGGER.log(FINE, "> " + messageToSend);
 				outputStream.get().write(messageToSend.getBytes(StandardCharsets.UTF_8));
 			} else {
 				LOGGER.log(INFO, "Could not get outputStream in SpikeCommandExecutorImpl.execute()");
@@ -132,6 +128,7 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 	public void executeVoid(final String command) throws IOException {
 		final Optional<OutputStream> outputStream = serialPort.getOutputStream();
 		if (outputStream.isPresent()) {
+			LOGGER.log(FINE, "> " + command);
 			outputStream.get().write((command + "\r\n").getBytes(StandardCharsets.UTF_8));
 		} else {
 			LOGGER.log(INFO, "Could not get outputStream in SpikeCommandExecutorImpl.executeVoid()");
@@ -149,7 +146,7 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 				.max()
 				.orElse(0) + 1;
 		callbackHandler.put(nextId, callback);
-		final String command = format("%s(lambda x: print(\"CB:%d:\" + str(x) + \"%s\"))\r\n", method, nextId, '%');
+		final String command = format("%s(lambda x: print(\"%s\" + \"CB:%d:\" + str(x) + \"%s\"))\r\n", method, "%%", nextId, "%%");
 
 		executeVoid(command);
 	}

@@ -34,7 +34,7 @@ public class SerialPortImpl implements LegoSerialPort {
 		serialPort.addDataListener(new SerialPortMessageListener() {
 			@Override
 			public byte[] getMessageDelimiter() {
-				return "%".getBytes();
+				return "%%".getBytes();
 			}
 
 			@Override

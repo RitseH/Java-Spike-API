@@ -149,7 +149,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 	@Override
 	public void initializeEvalFunction() throws IOException {
 		spikeCommandExecutor.executeVoid("def evaluator(msgType, counter, fn):\n " +
-				"return \"!{}:{}:{}%\".format(msgType, counter, eval(fn))\r\n");
+				"return \"%%{}:{}:{}%%\".format(msgType, counter, eval(fn))\r\n");
 	}
 
 	@Override
