@@ -107,7 +107,7 @@ public class SpikeCommandExecutorImpl implements SpikeCommandExecutor {
 				LOGGER.log(INFO, "Could not get outputStream in SpikeCommandExecutorImpl.execute()");
 			}
 			try {
-				result = exchanger.exchange("", 3, TimeUnit.SECONDS);
+				result = exchanger.exchange("", 15, TimeUnit.SECONDS);
 			} catch (TimeoutException e) {
 				e.printStackTrace();
 			}
