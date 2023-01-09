@@ -18,16 +18,6 @@ public class ColorSensor {
 	private final SpikeCommandExecutor spikeCommandExecutor;
 
 	/**
-	 * The scheduled executor service
-	 */
-	private final ScheduledExecutorService scheduledExecutorService;
-
-	/**
-	 * The future used to stop execution of scheduled task
-	 */
-	private Future<?> future;
-
-	/**
 	 * The desired result is used for events
 	 */
 	private String desiredResult = "Green";
@@ -36,12 +26,9 @@ public class ColorSensor {
 	 * Constructor.
 	 *
 	 * @param spikeCommandExecutor the spike command executor
-	 * @param executorService
 	 */
-	public ColorSensor(final SpikeCommandExecutor spikeCommandExecutor, final ScheduledExecutorService executorService) {
+	public ColorSensor(final SpikeCommandExecutor spikeCommandExecutor) {
 		this.spikeCommandExecutor = spikeCommandExecutor;
-		this.scheduledExecutorService = executorService;
-		start();
 	}
 
 	/** ACTIONS */
@@ -137,29 +124,6 @@ public class ColorSensor {
 			return 0;
 		}
 		return Integer.parseInt(result);
-	}
-
-	/**
-	 * Method to stop executing runnable task
-	 */
-	public void stop() {
-		future.cancel(true);
-	}
-
-	/**
-	 * Starts the scheduled executor service
-	 */
-	private void start() {
-		future = scheduledExecutorService.scheduleAtFixedRate(() -> {
-			try {
-				waitUntilColor(getColor());
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}, 0, 500, TimeUnit.MILLISECONDS);
-
 	}
 
 	/**

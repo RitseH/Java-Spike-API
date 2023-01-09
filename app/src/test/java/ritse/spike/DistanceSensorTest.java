@@ -1,10 +1,6 @@
 package ritse.spike;
 
-import static org.easymock.EasyMock.anyLong;
-import static org.easymock.EasyMock.anyObject;
-import static org.easymock.EasyMock.capture;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.newCapture;
 
 import java.io.IOException;
 import java.util.concurrent.ScheduledExecutorService;
@@ -45,10 +41,8 @@ public class DistanceSensorTest extends EasyMockSupport {
 
 	@BeforeEach
 	public void setUp() {
-		capture = newCapture();
-		expect(executorService.scheduleAtFixedRate(capture(capture), anyLong(), anyLong(), anyObject())).andReturn(scheduledFuture);
 		replayAll();
-		distanceSensor = new DistanceSensor(spikeCommandExecutor, executorService);
+		distanceSensor = new DistanceSensor(spikeCommandExecutor);
 		verifyAll();
 		resetAll();
 	}
@@ -132,11 +126,6 @@ public class DistanceSensorTest extends EasyMockSupport {
 		expect(spikeCommandExecutor.execute("distance_sensor.get_distance_cm()")).andReturn("20");
 		replayAll();
 
-		// Act
-		capture.getValue().run();
-
-		// Assert
-		verifyAll();
 	}
 
 	@Test
@@ -145,10 +134,5 @@ public class DistanceSensorTest extends EasyMockSupport {
 		expect(spikeCommandExecutor.execute("distance_sensor.get_distance_cm()")).andReturn("5");
 		replayAll();
 
-		// Act
-		capture.getValue().run();
-
-		// Assert
-		verifyAll();
 	}
 }

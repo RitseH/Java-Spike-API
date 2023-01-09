@@ -17,25 +17,15 @@ public class DistanceSensor {
 	 */
 	private final SpikeCommandExecutor spikeCommandExecutor;
 
-
-	/**
-	 * The scheduled executor service
-	 */
-	private final ScheduledExecutorService executorService;
-
-	private Future<?> future;
 	private int desiredResult = 10;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param executor        the executor
-	 * @param executorService
 	 */
-	public DistanceSensor(final SpikeCommandExecutor executor, final ScheduledExecutorService executorService) {
+	public DistanceSensor(final SpikeCommandExecutor executor) {
 		this.spikeCommandExecutor = executor;
-		this.executorService = executorService;
-		start();
 
 	}
 
@@ -149,24 +139,6 @@ public class DistanceSensor {
 		}
 	}
 
-	private void stop() {
-		future.cancel(true);
-	}
-
-	/**
-	 * Starts the scheduled executor service
-	 */
-	public void start() {
-		future = executorService.scheduleAtFixedRate(() -> {
-			try {
-				waitForDistanceCloserThan(getDistanceCm());
-			} catch (InterruptedException e) {
-				throw new RuntimeException(e);
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		}, 250, 500, TimeUnit.MILLISECONDS);
-	}
 
 	/**
 	 * Sets the desired result member variable

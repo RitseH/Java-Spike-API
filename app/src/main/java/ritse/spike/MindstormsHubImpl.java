@@ -115,7 +115,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 
 	@Override
 	public void createDistanceSensor(final String portChar) throws IOException {
-		distanceSensor = new DistanceSensor(spikeCommandExecutor, executorService);
+		distanceSensor = new DistanceSensor(spikeCommandExecutor);
 		spikeCommandExecutor.executeVoid(format("distance_sensor = DistanceSensor('%s')", portChar));
 	}
 
@@ -126,7 +126,7 @@ public class MindstormsHubImpl implements MindstormsHub {
 
 	@Override
 	public void createColorSensor(final String portChar) throws IOException {
-		colorSensor = new ColorSensor(spikeCommandExecutor, executorService);
+		colorSensor = new ColorSensor(spikeCommandExecutor);
 		spikeCommandExecutor.executeVoid(format("color_sensor = ColorSensor('%s')", portChar));
 	}
 
