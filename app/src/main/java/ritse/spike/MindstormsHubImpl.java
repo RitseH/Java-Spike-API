@@ -79,12 +79,11 @@ public class MindstormsHubImpl implements MindstormsHub {
 		buttonMap.put(ButtonEnum.CENTER, new Button(ButtonEnum.CENTER, spikeCommandExecutor));
 
 		createMotor(MotorEnum.A);
-		createMotor(MotorEnum.B);
-		createMotor(MotorEnum.E);
-		createMotor(MotorEnum.F);
 
-		createDistanceSensor("D");
+
 		createColorSensor("C");
+		createDistanceSensor("E");
+
 		initializeEvalFunction();
 	}
 
